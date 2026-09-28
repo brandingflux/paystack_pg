@@ -8,6 +8,7 @@ Built for developers in Nigeria and unsupported Stripe regions who are building 
 
 ## 📑 Table of Contents
 - [🌟 Key Features](#-key-features)
+- [🛡️ Security & PCI-DSS Compliance](#️-security--pci-dss-compliance)
 - [📚 In-Depth Guides](#-in-depth-documentation-guides)
 - [🚀 Beginner Quick Start](#-beginner-quick-start)
 - [⚙️ Environment Variables Reference](#️-environment-variables-reference)
@@ -19,7 +20,6 @@ Built for developers in Nigeria and unsupported Stripe regions who are building 
   - [4. Static Websites & Landing Pages (WordPress / Webflow / HTML)](#4-static-websites--landing-pages)
 - [🤖 Using With AI Coding Agents](#-using-with-ai-coding-agents)
 - [🗄️ Database Schemas & Webhooks](#️-database-schemas--webhooks)
-- [🛡️ Security Audit & Air-Gapped Mode](#️-security-audit--air-gapped-mode)
 - [🧪 Testing with Paystack Test Cards](#-testing-with-paystack-test-cards)
 - [🚢 Production Deployment](#-production-deployment)
 - [📁 Project Structure](#-project-structure)
@@ -38,9 +38,31 @@ Built for developers in Nigeria and unsupported Stripe regions who are building 
 
 ---
 
+## 🛡️ Security & PCI-DSS Compliance
+
+> [!IMPORTANT]
+> **PCI-DSS SAQ A Compliance (Zero-Card-Data Architecture):**
+> This gateway is engineered with a **zero-card-data footprint**. Your application server **never** touches, logs, or stores cardholder numbers (PANs) or CVVs. Card input fields intentionally omit HTML `name` attributes so card data is never transmitted in form payloads. All card entry occurs directly inside Paystack's PCI-DSS Level 1 certified modal iframe (`PaystackPop`).
+>
+> 📜 **Auditor Architecture Spec:** Read [**`docs/COMPLIANCE_AND_SETTLEMENT.md`**](docs/COMPLIANCE_AND_SETTLEMENT.md) for the complete PCI-DSS SAQ A data flow sequence diagram, Paystack USD vs. NGN settlement mechanics, and mathematical ceiling FX safeguards.
+
+### Production Security Defenses:
+1. **PCI-DSS SAQ A Zero-Scope:** Eliminates cardholder data risk; all card entry is tokenized inside Paystack's PCI Level 1 vault. (See [**`docs/COMPLIANCE_AND_SETTLEMENT.md`**](docs/COMPLIANCE_AND_SETTLEMENT.md)).
+2. **Timing-Safe HMAC Verification:** Webhook signatures are compared using `crypto.timingSafeEqual()` on byte buffers to prevent timing side-channel attacks.
+3. **Open-Redirect Defense:** `success_url` and `cancel_url` parameters are validated against strict regex/protocols to reject `javascript:`, `data:`, `vbscript:`, and protocol-relative `//` exploits.
+4. **Numeric Bounds & Type Sanitization:** Negative, `NaN`, or overflow amounts (> $10M) are rejected.
+5. **Rate Limiting & Helmet Headers:** Protects API routes from DoS, brute-force attacks, and disables server fingerprinting (`X-Powered-By`).
+6. **Air-Gapped Mode (`AIR_GAPPED_MODE=true`):**
+   - Disables all external HTTP requests to foreign rate APIs (`open.er-api.com`).
+   - Uses local immutable exchange rate tables.
+   - Eliminates third-party IP lookups (uses zero-latency reverse-proxy headers only).
+
+---
+
 ## 📚 In-Depth Documentation Guides
 
 - 🤖 [**AI Agent Implementation Spec (`AGENT_INSTRUCTIONS.md`)**](AGENT_INSTRUCTIONS.md): Machine-readable instructions for AI agents (Cursor, Windsurf, Claude Code, Copilot) to implement the gateway in any project.
+- 📜 [**PCI-DSS & Settlement Guide (`docs/COMPLIANCE_AND_SETTLEMENT.md`)**](docs/COMPLIANCE_AND_SETTLEMENT.md): PCI-DSS SAQ A zero-card-data scope, Paystack USD vs NGN settlement, and FX rounding guarantees.
 - 🌐 [**Universal Integration Guide (`docs/INTEGRATION_GUIDE.md`)**](docs/INTEGRATION_GUIDE.md): Connect Web Apps (React/Next.js), Chrome Extensions, Mobile Apps (React Native/Flutter), and Landing pages.
 - 🗄️ [**Database & Modeling Guide (`docs/DATABASE_SCHEMAS.md`)**](docs/DATABASE_SCHEMAS.md): PostgreSQL/Supabase, Prisma, and MongoDB schemas for users, subscriptions, orders, and licenses.
 - 🚀 [**Deployment & Webhook Setup (`docs/DEPLOYMENT_GUIDE.md`)**](docs/DEPLOYMENT_GUIDE.md): Deploy to Railway/Render/Docker and configure Paystack webhooks.
@@ -342,18 +364,8 @@ CREATE TABLE subscriptions (
 
 ---
 
-## 🛡️ Security Audit & Air-Gapped Mode
-
-The codebase was audited and hardened with the following defenses:
-
-1. **Timing-Safe HMAC Verification:** Webhook signatures are compared using `crypto.timingSafeEqual()` on byte buffers to prevent timing side-channel attacks.
-2. **Open-Redirect Defense:** `success_url` and `cancel_url` parameters are validated against strict regex/protocols to reject `javascript:`, `data:`, `vbscript:`, and protocol-relative `//` exploits.
-3. **Numeric Bounds & Type Sanitization:** Negative, `NaN`, or overflow amounts (> $10M) are rejected.
-4. **Rate Limiting & Helmet Headers:** Protects API routes from DoS, brute-force attacks, and disables server fingerprinting (`X-Powered-By`).
-5. **Air-Gapped Mode (`AIR_GAPPED_MODE=true`):**
-   - Disables all external HTTP requests to foreign rate APIs (`open.er-api.com`).
-   - Uses local immutable exchange rate tables.
-   - Eliminates third-party IP lookups (uses zero-latency reverse-proxy headers only).
+<a id="️-security-audit--air-gapped-mode"></a>
+*(For security defenses, PCI-DSS SAQ A compliance details, and air-gapped mode specifications, see [**🛡️ Security & PCI-DSS Compliance**](#️-security--pci-dss-compliance) near the top of this documentation).*
 
 ---
 
@@ -398,6 +410,7 @@ paystack_pg/
 ├── .env.example                  # Safe public environment template
 ├── .gitignore                    # Strict Git ignore (blocks secrets & customer data)
 ├── docs/
+│   ├── COMPLIANCE_AND_SETTLEMENT.md # PCI-DSS SAQ A scope & Paystack USD settlement
 │   ├── INTEGRATION_GUIDE.md      # Web, Extension, Mobile & Static site guides
 │   ├── DATABASE_SCHEMAS.md       # PostgreSQL, Prisma & MongoDB schemas
 │   └── DEPLOYMENT_GUIDE.md       # Production hosting & webhook setup

@@ -318,7 +318,8 @@ router.post('/sessions/:id/pay', async (req, res) => {
     const settlementCurrency = config.currency.merchantSettlement;
     const settlementAmount = fxService.convert(session.amount_total, session.currency, settlementCurrency, true);
     const decimals = SUPPORTED_CURRENCIES[settlementCurrency]?.decimals ?? 2;
-    const amountInKobo = Math.round(settlementAmount * Math.pow(10, decimals));
+    // Use Math.ceil to protect merchant from rounding down on fractional currency units
+    const amountInKobo = Math.ceil(settlementAmount * Math.pow(10, decimals));
 
     const callbackUrl = `${config.baseUrl}/api/v1/checkout/sessions/${session.id}/verify`;
 
