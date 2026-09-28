@@ -392,6 +392,7 @@ When testing with `sk_test_...` keys, use Paystack's official test credentials:
 paystack_pg/
 ├── AGENT_INSTRUCTIONS.md         # Machine-actionable AI agent integration specification
 ├── README.md                     # Master documentation
+├── LICENSE                       # MIT License (Free to use and modify)
 ├── setup.js                      # Beginner 1-click environment setup script
 ├── package.json                  # Dependencies & npm scripts
 ├── .env.example                  # Safe public environment template
@@ -431,4 +432,5 @@ paystack_pg/
 ---
 
 ## 📄 License
-MIT License. Free to use in personal and commercial applications.
+Released under the [MIT License](LICENSE).  
+You are free to use, modify, distribute, sublicense, and sell this software in both personal and commercial projects without restriction.
