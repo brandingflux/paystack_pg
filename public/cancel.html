@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Cancelled | Paystack Stripe Gateway</title>
+  <link rel="stylesheet" href="/css/checkout.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .cancel-card {
+      background: #ffffff;
+      border: 1px solid var(--stripe-border);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+    .cancel-icon-box {
+      width: 64px;
+      height: 64px;
+      background-color: #fef2f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      color: #ef4444;
+    }
+    .cancel-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--stripe-navy);
+      margin-bottom: 8px;
+    }
+    .cancel-subtitle {
+      font-size: 14px;
+      color: var(--stripe-text-sub);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .reason-box {
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 24px;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-primary {
+      padding: 14px;
+      background-color: var(--stripe-blurple);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      display: block;
+    }
+    .btn-secondary {
+      padding: 12px;
+      background-color: transparent;
+      border: 1px solid var(--stripe-border);
+      color: var(--stripe-text-sub);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="cancel-card">
+    <div class="cancel-icon-box">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </div>
+
+    <h1 class="cancel-title">Payment Cancelled</h1>
+    <p class="cancel-subtitle">No charges were made. You can return to your application or try checking out again.</p>
+
+    <div class="reason-box" id="reasonBox" style="display: none;"></div>
+
+    <div class="btn-group">
+      <a href="#" id="retryBtn" class="btn-primary">Try Again</a>
+      <a href="/" id="returnBtn" class="btn-secondary">Return to Application</a>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('sessionId');
+    const reason = params.get('reason');
+
+    if (reason) {
+      const box = document.getElementById('reasonBox');
+      box.textContent = `Reason: ${reason}`;
+      box.style.display = 'block';
+    }
+
+    if (sessionId) {
+      document.getElementById('retryBtn').href = `/checkout?sessionId=${sessionId}`;
+    } else {
+      document.getElementById('retryBtn').onclick = () => history.back();
+    }
+  </script>
+</body>
+</html>

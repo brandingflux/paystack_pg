@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing | Acme Pro Apps</title>
+  <link rel="stylesheet" href="/css/checkout.css">
+  <style>
+    body {
+      background-color: #ffffff;
+      color: #0a2540;
+      margin: 0;
+      padding: 0;
+    }
+    .demo-navbar {
+      border-bottom: 1px solid #e3e8ee;
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+    }
+    .brand-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0a2540;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-symbol {
+      width: 28px;
+      height: 28px;
+      background: #635bff;
+      border-radius: 6px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .hero-container {
+      max-width: 680px;
+      margin: 64px auto 40px auto;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .hero-tag {
+      font-size: 13px;
+      font-weight: 600;
+      color: #635bff;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+    .hero-heading {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      color: #0a2540;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero-subheading {
+      font-size: 17px;
+      color: #425466;
+      line-height: 1.5;
+    }
+    .pricing-cards-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      max-width: 860px;
+      margin: 0 auto 80px auto;
+      padding: 0 24px;
+    }
+    .plan-box {
+      border: 1px solid #e3e8ee;
+      border-radius: 12px;
+      padding: 36px 32px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .plan-box:hover {
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 12px 20px -2px rgba(0,0,0,0.05);
+    }
+    .plan-box.recommended {
+      border: 2px solid #635bff;
+    }
+    .recommended-pill {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background: #635bff;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+    }
+    .plan-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0a2540;
+      margin-bottom: 6px;
+    }
+    .plan-header p {
+      font-size: 14px;
+      color: #697386;
+      min-height: 40px;
+    }
+    .plan-cost {
+      margin: 24px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .plan-cost .amount {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: #0a2540;
+    }
+    .plan-cost .cadence {
+      font-size: 15px;
+      color: #697386;
+      font-weight: 400;
+    }
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px 0;
+    }
+    .features-list li {
+      font-size: 14px;
+      color: #425466;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .features-list svg {
+      color: #635bff;
+      flex-shrink: 0;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-action {
+      width: 100%;
+      height: 44px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-action-primary {
+      background-color: #635bff;
+      color: white;
+    }
+    .btn-action-primary:hover {
+      background-color: #5046e5;
+    }
+    .btn-action-secondary {
+      background-color: transparent;
+      border: 1px solid #e3e8ee;
+      color: #0a2540;
+    }
+    .btn-action-secondary:hover {
+      background-color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-navbar">
+    <div class="brand-logo">
+      <div class="brand-symbol">A</div>
+      <span>Acme Pro Apps</span>
+    </div>
+    <div style="font-size: 13px; color: #697386;">
+      Secure Checkout
+    </div>
+  </nav>
+
+  <div class="hero-container">
+    <div class="hero-tag">Transparent Pricing</div>
+    <h1 class="hero-heading">Simple, predictable pricing for apps & extensions</h1>
+    <p class="hero-subheading">Choose the plan that fits your workflow. Cancel or switch anytime.</p>
+  </div>
+
+  <div class="pricing-cards-wrapper">
+    <!-- Recurring Monthly Plan -->
+    <div class="plan-box recommended">
+      <div class="recommended-pill">POPULAR</div>
+      <div>
+        <div class="plan-header">
+          <h3>Pro Subscription</h3>
+          <p>Continuous cloud sync, updates, and priority features.</p>
+        </div>
+        <div class="plan-cost">
+          <span class="amount" id="subPrice">$9.99</span>
+          <span class="cadence">/ month</span>
+        </div>
+        <ul class="features-list">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Automatic monthly billing
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Full extension & web access
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Priority support
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Cancel anytime
+          </li>
+        </ul>
+      </div>
+      <div class="button-group">
+        <button id="subModalBtn" class="btn-action btn-action-primary">Open Checkout Modal</button>
+        <button id="subRedirectBtn" class="btn-action btn-action-secondary">Hosted Checkout Page</button>
+      </div>
+    </div>
+
+    <!-- Lifetime One-Time License -->
+    <div class="plan-box">
+      <div>
+        <div class="plan-header">
+          <h3>Lifetime License</h3>
+          <p>Pay once, keep forever. Ideal for individual developers.</p>
+        </div>
+        <div class="plan-cost">
+          <span class="amount" id="onePrice">$49.00</span>
+          <span class="cadence">one-time</span>
+        </div>
+        <ul class="features-list">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Lifetime license key
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            No recurring charges
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Install on up to 3 devices
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Instant digital delivery
+          </li>
+        </ul>
+      </div>
+      <div class="button-group">
+        <button id="oneModalBtn" class="btn-action btn-action-primary">Open Checkout Modal</button>
+        <button id="oneRedirectBtn" class="btn-action btn-action-secondary">Hosted Checkout Page</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/sdk/paystack-checkout.js"></script>
+  <script>
+    const pss = new PaystackStripe({ backendUrl: window.location.origin });
+
+    async function loadLocalizedPrices() {
+      try {
+        const geo = await pss.detectUserCurrency();
+        const userCurrency = geo.currency || 'USD';
+
+        // Convert $9.99
+        const subRes = await fetch(`/api/v1/currencies/convert?amount=9.99&from=USD&to=${userCurrency}`);
+        const subData = await subRes.json();
+        if (subData.formattedConverted) {
+          document.getElementById('subPrice').textContent = subData.formattedConverted;
+        }
+
+        // Convert $49.00
+        const oneRes = await fetch(`/api/v1/currencies/convert?amount=49.00&from=USD&to=${userCurrency}`);
+        const oneData = await oneRes.json();
+        if (oneData.formattedConverted) {
+          document.getElementById('onePrice').textContent = oneData.formattedConverted;
+        }
+      } catch (e) {
+        console.error('Price load error:', e);
+      }
+    }
+
+    async function handleSubscribe(isModal) {
+      try {
+        const session = await pss.createCheckoutSession({
+          mode: 'subscription',
+          subscription_interval: 'monthly',
+          line_items: [
+            {
+              name: 'Pro Subscription',
+              description: 'Continuous cloud sync & AI features',
+              amount: 9.99,
+              currency: 'USD',
+              quantity: 1
+            }
+          ],
+          success_url: `${window.location.origin}/success.html?sessionId={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${window.location.origin}/cancel.html?sessionId={CHECKOUT_SESSION_ID}`
+        });
+
+        if (isModal) {
+          pss.openModal({
+            sessionId: session.id,
+            onComplete: () => {
+              window.location.href = `/success.html?sessionId=${session.id}`;
+            }
+          });
+        } else {
+          pss.redirectToCheckout({ sessionId: session.id });
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function handleLifetime(isModal) {
+      try {
+        const session = await pss.createCheckoutSession({
+          mode: 'payment',
+          line_items: [
+            {
+              name: 'Lifetime License',
+              description: 'Perpetual license key',
+              amount: 49.00,
+              currency: 'USD',
+              quantity: 1
+            }
+          ],
+          success_url: `${window.location.origin}/success.html?sessionId={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${window.location.origin}/cancel.html?sessionId={CHECKOUT_SESSION_ID}`
+        });
+
+        if (isModal) {
+          pss.openModal({
+            sessionId: session.id,
+            onComplete: () => {
+              window.location.href = `/success.html?sessionId=${session.id}`;
+            }
+          });
+        } else {
+          pss.redirectToCheckout({ sessionId: session.id });
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    document.getElementById('subModalBtn').onclick = () => handleSubscribe(true);
+    document.getElementById('subRedirectBtn').onclick = () => handleSubscribe(false);
+    document.getElementById('oneModalBtn').onclick = () => handleLifetime(true);
+    document.getElementById('oneRedirectBtn').onclick = () => handleLifetime(false);
+
+    loadLocalizedPrices();
+  </script>
+</body>
+</html>

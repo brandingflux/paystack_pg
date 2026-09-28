@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Simulator | Test Mode</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0a2540;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #ffffff;
+      border: 1px solid #e3e8ee;
+      border-radius: 12px;
+      padding: 36px 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06);
+    }
+    .test-pill {
+      background: #e0e7ff;
+      color: #4338ca;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    h2 {
+      margin-bottom: 8px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    p {
+      color: #697386;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn {
+      width: 100%;
+      height: 44px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background-color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-success {
+      background-color: #635bff;
+      color: white;
+    }
+    .btn-success:hover {
+      background-color: #5046e5;
+    }
+    .btn-cancel {
+      background-color: transparent;
+      color: #697386;
+      border: 1px solid #e3e8ee;
+    }
+    .btn-cancel:hover {
+      background-color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+  <div class="modal-card">
+    <div class="test-pill">TEST MODE SIMULATOR</div>
+    <h2>Complete Payment</h2>
+    <p>This is a secure simulation for local testing. Click below to complete your test transaction.</p>
+
+    <button id="successBtn" class="btn btn-success">Authorize Payment</button>
+    <button id="cancelBtn" class="btn btn-cancel">Cancel and Return</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get('reference') || 'mock_ref_' + Date.now();
+
+    document.getElementById('successBtn').onclick = () => {
+      window.location.href = `/api/v1/checkout/sessions/any/verify?reference=${encodeURIComponent(reference)}`;
+    };
+
+    document.getElementById('cancelBtn').onclick = () => {
+      history.back();
+    };
+  </script>
+</body>
+</html>

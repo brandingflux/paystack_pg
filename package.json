@@ -1,0 +1,35 @@
+{
+  "name": "paystack-stripe-gateway",
+  "version": "1.0.0",
+  "description": "Stripe-styled global payment gateway powered by Paystack with live multi-currency auto-conversion, one-time payments, and recurring subscriptions for apps & Chrome extensions.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "paystack",
+    "stripe",
+    "payment-gateway",
+    "multi-currency",
+    "chrome-extension",
+    "subscriptions",
+    "recurring-billing",
+    "nigeria",
+    "usd",
+    "cny",
+    "ngn"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0"
+  }
+}

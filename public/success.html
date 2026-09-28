@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful</title>
+  <link rel="stylesheet" href="/css/checkout.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .receipt-container {
+      background: #ffffff;
+      border: 1px solid var(--stripe-border);
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      padding: 40px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+    .receipt-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background-color: #ecfdf5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      color: #059669;
+    }
+    .receipt-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--stripe-navy);
+      margin-bottom: 6px;
+    }
+    .receipt-subtitle {
+      font-size: 14px;
+      color: var(--stripe-slate);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .receipt-amount {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--stripe-navy);
+      margin-bottom: 24px;
+    }
+    .receipt-table {
+      width: 100%;
+      border-top: 1px solid var(--stripe-border);
+      border-bottom: 1px solid var(--stripe-border);
+      padding: 18px 0;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .receipt-row:last-child {
+      margin-bottom: 0;
+    }
+    .receipt-label {
+      color: var(--stripe-muted);
+    }
+    .receipt-value {
+      font-weight: 600;
+      color: var(--stripe-navy);
+    }
+    .receipt-return-btn {
+      width: 100%;
+      height: 44px;
+      background-color: var(--stripe-blurple);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+    }
+    .receipt-return-btn:hover {
+      background-color: var(--stripe-blurple-hover);
+    }
+    .receipt-actions {
+      margin-top: 16px;
+      font-size: 12px;
+    }
+    .receipt-actions a {
+      color: var(--stripe-muted);
+      text-decoration: none;
+    }
+    .receipt-actions a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <div class="receipt-icon-wrap">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+
+    <h1 class="receipt-title" id="receiptTitle">Payment Successful</h1>
+    <p class="receipt-subtitle" id="receiptSubtitle">A confirmation has been sent to your email.</p>
+
+    <div class="receipt-amount" id="receiptAmount">$0.00</div>
+
+    <div class="receipt-table">
+      <div class="receipt-row">
+        <span class="receipt-label">Status</span>
+        <span class="receipt-value" style="color: #059669;">● Paid</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Account</span>
+        <span class="receipt-value" id="receiptEmail">-</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Confirmation Number</span>
+        <span class="receipt-value" id="receiptRef" style="font-family: monospace; font-size: 12px;">-</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Date</span>
+        <span class="receipt-value" id="receiptDate">-</span>
+      </div>
+    </div>
+
+    <a href="/" id="returnActionBtn" class="receipt-return-btn">Return to Application</a>
+
+    <div class="receipt-actions">
+      <a href="#" onclick="window.print(); return false;">Print receipt</a>
+    </div>
+  </div>
+
+  <script>
+    (async function() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('sessionId');
+
+      if (!sessionId) return;
+
+      try {
+        const res = await fetch(`/api/v1/checkout/sessions/${sessionId}`);
+        const data = await res.json();
+
+        if (data.status) {
+          const session = data.session;
+          const pricing = data.pricing;
+
+          document.getElementById('receiptAmount').textContent = pricing.displayFormatted;
+          document.getElementById('receiptEmail').textContent = session.customer_email || 'Customer';
+          document.getElementById('receiptRef').textContent = session.reference || session.id;
+          document.getElementById('receiptDate').textContent = new Date().toLocaleDateString(undefined, { 
+            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+          });
+
+          if (session.mode === 'subscription') {
+            document.getElementById('receiptTitle').textContent = 'Subscription Activated';
+            document.getElementById('receiptSubtitle').textContent = `Your recurring plan is active.`;
+          }
+
+          if (session.success_url) {
+            const redirectUrl = session.success_url
+              .replace('{CHECKOUT_SESSION_ID}', session.id)
+              .replace('%7BCHECKOUT_SESSION_ID%7D', session.id);
+            document.getElementById('returnActionBtn').href = redirectUrl;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load receipt:', e);
+      }
+    })();
+  </script>
+</body>
+</html>

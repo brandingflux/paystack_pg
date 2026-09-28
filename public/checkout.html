@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="/css/checkout.css">
+  <!-- Paystack Seamless Engine -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+  <div class="checkout-wrapper">
+    <!-- LEFT COLUMN: Product & Order Summary -->
+    <div class="summary-column">
+      <div class="summary-content-top">
+        <a href="#" id="backBtn" class="back-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span id="backBtnText">Back</span>
+        </a>
+
+        <div class="brand-row">
+          <div class="brand-avatar" id="brandAvatar">P</div>
+          <div class="brand-details">
+            <span class="brand-name" id="brandName">Acme Pro Apps</span>
+          </div>
+        </div>
+
+        <div class="order-headline" id="orderHeadline">Subscribe to</div>
+
+        <div class="price-display-wrapper">
+          <div class="price-main">
+            <span id="heroPrice">$0.00</span>
+            <span class="price-interval" id="heroInterval"></span>
+          </div>
+        </div>
+
+        <!-- Order Breakdown -->
+        <div class="order-breakdown" id="orderBreakdown">
+          <div class="order-line-item">
+            <div>
+              <div class="line-item-desc" id="itemTitle">Item</div>
+              <div class="line-item-sub" id="itemSubtitle">Billed today</div>
+            </div>
+            <div class="line-item-amount" id="itemAmount">$0.00</div>
+          </div>
+          <div class="order-total-row">
+            <span>Total due today</span>
+            <span id="totalDueAmount">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtle Currency Switcher at Bottom of Left Column -->
+      <div class="summary-footer">
+        <div class="currency-locale-picker">
+          <span style="font-size: 14px;">🌐</span>
+          <select id="currencySelect" class="currency-select-minimal" aria-label="Select Currency">
+            <option value="USD">USD ($)</option>
+            <option value="CNY">CNY (¥)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="CAD">CAD (CA$)</option>
+            <option value="AUD">AUD (A$)</option>
+            <option value="JPY">JPY (¥)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="SGD">SGD (S$)</option>
+            <option value="AED">AED</option>
+            <option value="NGN">NGN (₦)</option>
+          </select>
+          <span class="picker-arrow">▾</span>
+        </div>
+        <span style="font-size: 12px; color: #a0aec0;">Powered by Stripe-Engine</span>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Payment Form -->
+    <div class="payment-column">
+      <div class="payment-form-container">
+        
+        <!-- Express Checkout -->
+        <div class="express-checkout-box">
+          <button type="button" id="expressLinkBtn" class="express-btn-link">
+            <span>⚡ Pay with Link</span>
+          </button>
+        </div>
+
+        <div class="or-divider">
+          <span class="or-divider-text">Or pay with card</span>
+        </div>
+
+        <form id="stripePaymentForm">
+          <!-- Email -->
+          <div class="field-group">
+            <label class="field-label" for="customerEmail">Email</label>
+            <input 
+              type="email" 
+              id="customerEmail" 
+              class="stripe-input" 
+              placeholder="name@example.com" 
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <!-- Unified Card Element -->
+          <div class="field-group">
+            <label class="field-label">Card information</label>
+            <div class="stripe-card-group">
+              <!-- Card Number -->
+              <div class="card-number-row">
+                <input 
+                  type="text" 
+                  id="cardNumber" 
+                  class="card-number-input" 
+                  placeholder="1234 1234 1234 1234" 
+                  inputmode="numeric"
+                  maxlength="19"
+                  autocomplete="cc-number"
+                  required
+                >
+                <div class="card-icons-slot" id="cardBrandIconSlot">
+                  <!-- Default card brand logos -->
+                  <svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none">
+                    <rect width="36" height="24" rx="3" fill="#0A2540"/>
+                    <path d="M14.5 16.5L16.8 7.5H19.2L16.9 16.5H14.5ZM12.7 7.5L10.4 13.8L10.1 12.3C9.6 10.6 8.1 8.8 6.5 7.9L8.6 16.5H11.1L15.1 7.5H12.7ZM25.2 16.5H27.5L25.6 7.5H23.5C23.0 7.5 22.6 7.8 22.4 8.2L19.2 16.5H21.7L22.2 15.1H25.0L25.2 16.5ZM22.8 13.2L24.0 9.8L24.7 13.2H22.8ZM33.2 7.5H30.8C30.4 7.5 30.1 7.7 29.9 8.1L26.3 16.5H28.8L29.3 15.1H32.2L32.5 16.5H35.0L33.2 7.5ZM5.4 7.5H0.8L0.7 7.9C3.8 8.7 6.4 10.6 7.3 12.8L6.4 8.5C6.2 7.8 5.8 7.5 5.4 7.5Z" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Expiry & CVC Row -->
+              <div class="card-details-row">
+                <div class="card-expiry-half">
+                  <input 
+                    type="text" 
+                    id="cardExpiry" 
+                    class="card-sub-input" 
+                    placeholder="MM / YY" 
+                    inputmode="numeric" 
+                    maxlength="5"
+                    autocomplete="cc-exp"
+                    required
+                  >
+                </div>
+                <div class="card-cvc-half">
+                  <input 
+                    type="text" 
+                    id="cardCvc" 
+                    class="card-sub-input" 
+                    placeholder="CVC" 
+                    inputmode="numeric" 
+                    maxlength="4"
+                    autocomplete="cc-csc"
+                    required
+                  >
+                  <div class="cvc-icon-slot">
+                    <svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <rect x="1" y="1" width="22" height="16" rx="2"></rect>
+                      <line x1="1" y1="6" x2="23" y2="6"></line>
+                      <circle cx="18" cy="12" r="1.5"></circle>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cardholder Name -->
+          <div class="field-group">
+            <label class="field-label" for="cardholderName">Cardholder name</label>
+            <input 
+              type="text" 
+              id="cardholderName" 
+              class="stripe-input" 
+              placeholder="Full name on card" 
+              autocomplete="name"
+              required
+            >
+          </div>
+
+          <!-- Country or Region -->
+          <div class="field-group">
+            <label class="field-label" for="billingCountry">Country or region</label>
+            <select id="billingCountry" class="stripe-input" style="cursor: pointer;">
+              <option value="US">United States</option>
+              <option value="CN">China</option>
+              <option value="GB">United Kingdom</option>
+              <option value="CA">Canada</option>
+              <option value="AU">Australia</option>
+              <option value="DE">Germany</option>
+              <option value="FR">France</option>
+              <option value="JP">Japan</option>
+              <option value="IN">India</option>
+              <option value="SG">Singapore</option>
+              <option value="NG">Nigeria</option>
+              <option value="GH">Ghana</option>
+              <option value="ZA">South Africa</option>
+              <option value="AE">United Arab Emirates</option>
+            </select>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="submitPayBtn" class="stripe-submit-btn">
+            <span class="spinner" id="btnSpinner"></span>
+            <span id="btnLabel">Pay</span>
+          </button>
+        </form>
+
+        <!-- Security Footnote -->
+        <div class="secure-footnote">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Guaranteed safe & secure checkout</span>
+        </div>
+
+        <div class="legal-footer">
+          <a href="#">Powered by Stripe</a>
+          <span>•</span>
+          <a href="#">Terms</a>
+          <span>•</span>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/checkout.js"></script>
+</body>
+</html>

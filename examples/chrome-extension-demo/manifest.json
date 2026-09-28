@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Paystack-Stripe Extension Demo",
+  "version": "1.0.0",
+  "description": "Chrome Extension demonstrating paid recurring subscriptions and one-time purchases via Paystack with Stripe UI.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Paystack-Stripe Monetized Extension"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
