@@ -341,6 +341,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
 
     // Handle Recurring Subscriptions
     if (session.mode === 'subscription') {
+      const firstItem = (session.line_items && session.line_items[0]) || {};
       const planBrand = session.merchant_name || config.merchant.name;
       const planName = `${planBrand} - ${firstItem.name || 'Pro Plan'} (${session.subscription_interval})`;
       
