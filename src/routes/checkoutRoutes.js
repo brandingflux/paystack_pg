@@ -148,6 +148,16 @@ router.post('/sessions', async (req, res) => {
       });
     }
 
+    // App-specific security enforcement for Focus825 Chrome Extension
+    if (metadata && metadata.app_id === 'focus825_chrome_ext') {
+      if (total < 2.99 || mode !== 'subscription' || subscription_interval !== 'monthly') {
+        return res.status(400).json({
+          status: false,
+          error: 'Focus825 Pro requires a monthly recurring subscription of at least $2.99 USD'
+        });
+      }
+    }
+
     const isLive = !config.paystack.isTestKey && config.paystack.isConfigured;
 
     const session = sessionStore.create({
@@ -500,7 +510,7 @@ router.get('/customer/:email/status', async (req, res) => {
  */
 router.post('/verify-restore', async (req, res) => {
   try {
-    const { reference, sessionId, email } = req.body;
+    const { reference, sessionId, email, app_id } = req.body;
     const cleanRef = (reference || '').trim();
     const cleanSessionId = (sessionId || '').trim();
     const cleanEmail = (email || '').trim().toLowerCase();
@@ -521,6 +531,12 @@ router.post('/verify-restore', async (req, res) => {
     if (cleanSessionId && isValidSessionId(cleanSessionId)) {
       const session = sessionStore.get(cleanSessionId);
       if (session && session.payment_status === 'paid') {
+        if (app_id && session.metadata?.app_id && session.metadata.app_id !== app_id) {
+          return res.status(403).json({
+            status: false,
+            error: 'Transaction reference belongs to a different application.'
+          });
+        }
         isPaid = true;
         customerEmail = session.customer_email || customerEmail;
         paidAt = session.paid_at;
@@ -530,6 +546,12 @@ router.post('/verify-restore', async (req, res) => {
     if (!isPaid && cleanRef) {
       const session = sessionStore.getByReference(cleanRef);
       if (session && session.payment_status === 'paid') {
+        if (app_id && session.metadata?.app_id && session.metadata.app_id !== app_id) {
+          return res.status(403).json({
+            status: false,
+            error: 'Transaction reference belongs to a different application.'
+          });
+        }
         isPaid = true;
         customerEmail = session.customer_email || customerEmail;
         paidAt = session.paid_at;
@@ -548,6 +570,15 @@ router.post('/verify-restore', async (req, res) => {
               error: 'Transaction reference does not match the provided email address.'
             });
           }
+
+          // Check app_id isolation if specified
+          if (app_id && verifyData.metadata?.app_id && verifyData.metadata.app_id !== app_id) {
+            return res.status(403).json({
+              status: false,
+              error: 'Transaction reference belongs to a different application.'
+            });
+          }
+
           isPaid = true;
           customerEmail = verifyData.customer?.email || customerEmail;
           paidAt = verifyData.paid_at || new Date().toISOString();
