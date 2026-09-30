@@ -152,13 +152,46 @@
     detectCardBrand(val);
   });
 
-  // Expiry formatting MM / YY
+  // Expiry formatting MM / YY with seamless backspacing
+  cardExpiry.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace') {
+      const val = cardExpiry.value;
+      // If cursor is at the separator (e.g. "MM / "), cleanly delete into the month
+      if (val.length === 5 && val.endsWith(' / ')) {
+        e.preventDefault();
+        cardExpiry.value = val.substring(0, 1);
+      }
+    }
+  });
+
   cardExpiry.addEventListener('input', (e) => {
-    let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-    if (val.length >= 2) {
-      e.target.value = val.substring(0, 2) + ' / ' + val.substring(2);
+    let inputVal = e.target.value;
+    
+    // When deleting backward, let user backspace cleanly past separator
+    if (e.inputType === 'deleteContentBackward') {
+      if (inputVal.endsWith(' /') || inputVal.endsWith(' ')) {
+        e.target.value = inputVal.replace(/\D+$/, '');
+        return;
+      }
+    }
+
+    let digits = inputVal.replace(/\D/g, '').substring(0, 4);
+
+    // Auto-prefix months 2-9 with 0 (e.g. typing 4 -> 04 / )
+    if (digits.length === 1 && parseInt(digits, 10) > 1 && e.inputType !== 'deleteContentBackward') {
+      digits = '0' + digits;
+    }
+
+    if (digits.length >= 2) {
+      let month = parseInt(digits.substring(0, 2), 10);
+      if (month > 12) month = 12;
+      if (month === 0) month = 1;
+      const monthStr = String(month).padStart(2, '0');
+      const yearStr = digits.substring(2);
+
+      e.target.value = monthStr + ' / ' + yearStr;
     } else {
-      e.target.value = val;
+      e.target.value = digits;
     }
   });
 
