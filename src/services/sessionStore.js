@@ -69,6 +69,8 @@ class SessionStore {
       payment_status: 'unpaid',
       customer_email: data.customer_email || null,
       customer_name: data.customer_name || null,
+      merchant_name: data.merchant_name || null,
+      merchant_logo: data.merchant_logo || null,
       line_items: data.line_items || [],
       amount_total: data.amount_total || 0,
       currency: (data.currency || 'USD').toUpperCase(),

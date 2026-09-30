@@ -48,6 +48,8 @@ router.post('/sessions', async (req, res) => {
       line_items = [],
       customer_email,
       customer_name,
+      merchant_name,
+      merchant_logo,
       success_url,
       cancel_url,
       metadata = {},
@@ -155,6 +157,8 @@ router.post('/sessions', async (req, res) => {
       currency: currency.toUpperCase(),
       customer_email: customer_email ? customer_email.trim() : null,
       customer_name: customer_name ? String(customer_name).substring(0, 100) : null,
+      merchant_name: merchant_name ? String(merchant_name).substring(0, 100) : null,
+      merchant_logo: merchant_logo ? String(merchant_logo).substring(0, 500) : null,
       success_url,
       cancel_url,
       metadata: typeof metadata === 'object' && metadata !== null ? metadata : {},
@@ -267,8 +271,8 @@ router.get('/sessions/:id', async (req, res) => {
         detectedCurrency: displayCurrency
       },
       merchant: {
-        name: config.merchant.name,
-        logoUrl: config.merchant.logoUrl,
+        name: session.merchant_name || config.merchant.name,
+        logoUrl: session.merchant_logo || config.merchant.logoUrl,
         supportEmail: config.merchant.supportEmail,
         isMockMode: paystackService.isMockMode(),
         paystackPublicKey: config.paystack.publicKey || 'pk_test_demo_placeholder'
@@ -337,8 +341,8 @@ router.post('/sessions/:id/pay', async (req, res) => {
 
     // Handle Recurring Subscriptions
     if (session.mode === 'subscription') {
-      const firstItem = session.line_items[0] || {};
-      const planName = `${config.merchant.name} - ${firstItem.name || 'Pro Plan'} (${session.subscription_interval})`;
+      const planBrand = session.merchant_name || config.merchant.name;
+      const planName = `${planBrand} - ${firstItem.name || 'Pro Plan'} (${session.subscription_interval})`;
       
       const planInfo = await paystackService.getOrCreatePlan({
         name: planName,
