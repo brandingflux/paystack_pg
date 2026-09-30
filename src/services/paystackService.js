@@ -207,6 +207,36 @@ class PaystackService {
       return false;
     }
   }
+
+  /**
+   * Fetch customer subscriptions from Paystack API
+   * @param {string} email
+   * @returns {Promise<Array>}
+   */
+  async getCustomerSubscriptions(email) {
+    if (this.isMockMode()) {
+      return [];
+    }
+
+    try {
+      const res = await this.api.get(`/customer/${encodeURIComponent(email)}`, {
+        headers: this.getHeaders()
+      });
+
+      if (!res.data?.status || !res.data?.data) {
+        return [];
+      }
+
+      return res.data.data.subscriptions || [];
+    } catch (err) {
+      if (err.response?.status === 404) {
+        return [];
+      }
+      const errorMsg = err.response?.data?.message || err.message;
+      console.warn('[PaystackService.getCustomerSubscriptions] Notice:', errorMsg);
+      return [];
+    }
+  }
 }
 
 export const paystackService = new PaystackService();

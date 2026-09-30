@@ -102,6 +102,18 @@ class SessionStore {
     return null;
   }
 
+  findByEmail(email) {
+    if (!email) return [];
+    const normalized = String(email).trim().toLowerCase();
+    const matches = [];
+    for (const session of this.sessions.values()) {
+      if (session.customer_email && session.customer_email.toLowerCase() === normalized) {
+        matches.push(session);
+      }
+    }
+    return matches;
+  }
+
   update(id, partial) {
     const session = this.sessions.get(id);
     if (!session) return null;

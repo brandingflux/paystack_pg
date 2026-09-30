@@ -455,4 +455,43 @@ router.get('/sessions/:id/status', (req, res) => {
   });
 });
 
+/**
+ * GET /api/v1/checkout/customer/:email/status
+ * Check if a customer has an active subscription or paid session
+ */
+router.get('/customer/:email/status', async (req, res) => {
+  try {
+    const email = (req.params.email || '').trim().toLowerCase();
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ status: false, error: 'A valid email address is required' });
+    }
+
+    // 1. Check local sessionStore for any paid session matching this email
+    const sessions = sessionStore.findByEmail(email);
+    const paidSession = sessions.find(s => s.payment_status === 'paid');
+
+    // 2. Check Paystack API directly for active subscriptions
+    const subscriptions = await paystackService.getCustomerSubscriptions(email);
+    const activeSubscription = subscriptions.find(s => s.status === 'active' || s.status === 'non-renewing');
+
+    const isSubscribed = Boolean(activeSubscription || paidSession);
+
+    res.json({
+      status: true,
+      email,
+      isSubscribed,
+      subscription: activeSubscription || null,
+      paidSession: paidSession ? {
+        id: paidSession.id,
+        paidAt: paidSession.paid_at,
+        amount: paidSession.amount_total,
+        currency: paidSession.currency
+      } : null
+    });
+  } catch (err) {
+    console.error('[customerStatus] Error:', err);
+    res.status(500).json({ status: false, error: 'Internal server error checking customer status' });
+  }
+});
+
 export default router;
