@@ -62,6 +62,7 @@ Built for developers in Nigeria and unsupported Stripe regions who are building 
 ## 📚 In-Depth Documentation Guides
 
 - 🤖 [**AI Agent Implementation Spec (`AGENT_INSTRUCTIONS.md`)**](AGENT_INSTRUCTIONS.md): Machine-readable instructions for AI agents (Cursor, Windsurf, Claude Code, Copilot) to implement the gateway in any project.
+- 🏢 [**Multi-App & Dynamic Pricing Guide (`docs/MULTIPLE_APPS_GUIDE.md`)**](docs/MULTIPLE_APPS_GUIDE.md): Monetize multiple Chrome extensions, websites, and SaaS apps with custom pricing, intervals, branding, and webhook routing on a single instance.
 - 📜 [**PCI-DSS & Settlement Guide (`docs/COMPLIANCE_AND_SETTLEMENT.md`)**](docs/COMPLIANCE_AND_SETTLEMENT.md): PCI-DSS SAQ A zero-card-data scope, Paystack USD vs NGN settlement, and FX rounding guarantees.
 - 🌐 [**Universal Integration Guide (`docs/INTEGRATION_GUIDE.md`)**](docs/INTEGRATION_GUIDE.md): Connect Web Apps (React/Next.js), Chrome Extensions, Mobile Apps (React Native/Flutter), and Landing pages.
 - 🗄️ [**Database & Modeling Guide (`docs/DATABASE_SCHEMAS.md`)**](docs/DATABASE_SCHEMAS.md): PostgreSQL/Supabase, Prisma, and MongoDB schemas for users, subscriptions, orders, and licenses.
@@ -411,6 +412,7 @@ paystack_pg/
 ├── .gitignore                    # Strict Git ignore (blocks secrets & customer data)
 ├── docs/
 │   ├── COMPLIANCE_AND_SETTLEMENT.md # PCI-DSS SAQ A scope & Paystack USD settlement
+│   ├── MULTIPLE_APPS_GUIDE.md    # Multi-app & dynamic pricing architecture
 │   ├── INTEGRATION_GUIDE.md      # Web, Extension, Mobile & Static site guides
 │   ├── DATABASE_SCHEMAS.md       # PostgreSQL, Prisma & MongoDB schemas
 │   └── DEPLOYMENT_GUIDE.md       # Production hosting & webhook setup

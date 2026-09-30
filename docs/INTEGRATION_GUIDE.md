@@ -6,6 +6,7 @@ This guide explains how to connect your **Paystack-Stripe Global Gateway** to an
 - [3. Mobile Apps (React Native / Expo & Flutter)](#3-mobile-apps)
 - [4. Websites & Landing Pages (WordPress, Webflow, HTML)](#4-websites--landing-pages)
 - [5. License Verification & Security Architecture](#5-license-verification--security-architecture)
+- [6. Multi-App & Dynamic Pricing Architecture](#6-multi-app--dynamic-pricing-architecture)
 
 ---
 
@@ -359,3 +360,14 @@ function generateLicenseToken(customerEmail, planName) {
 }
 ```
 Your apps can verify this license offline using the public key or secret!
+
+---
+
+## 6. Multi-App & Dynamic Pricing Architecture
+
+Need to monetize **multiple Chrome extensions, websites, or SaaS apps** with completely different pricing, intervals, and brand names using your single hosted gateway?
+
+📖 **Read the Dedicated Multi-App Architecture Guide:** [**`docs/MULTIPLE_APPS_GUIDE.md`**](MULTIPLE_APPS_GUIDE.md)
+- Explains how to pass dynamic `line_items`, `merchant_name`, and `metadata.app_id` per app.
+- Outlines automated on-the-fly Paystack plan generation without dashboard setup.
+- Covers centralized webhook routing to unlock licenses across separate apps.
