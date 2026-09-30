@@ -1,10 +1,20 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+const sanitizeBaseUrl = (url, port) => {
+  let u = (url || `http://localhost:${port}`).trim().replace(/\/+$/, '');
+  if (!u.startsWith('http://') && !u.startsWith('https://')) {
+    u = u.includes('localhost') || u.includes('127.0.0.1') ? `http://${u}` : `https://${u}`;
+  }
+  return u;
+};
+
+const port = parseInt(process.env.PORT || '3000', 10);
+
 export const config = {
-  port: parseInt(process.env.PORT || '3000', 10),
+  port,
   nodeEnv: process.env.NODE_ENV || 'development',
-  baseUrl: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`,
+  baseUrl: sanitizeBaseUrl(process.env.BASE_URL, port),
 
   security: {
     // Air-gapped / fully self-contained mode: eliminates all external third-party calls (FX, GeoIP, telemetry)
