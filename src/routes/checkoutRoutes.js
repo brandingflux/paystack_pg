@@ -494,4 +494,160 @@ router.get('/customer/:email/status', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/v1/checkout/verify-restore
+ * Securely restores a purchase using the private Paystack Transaction Reference or Session ID
+ */
+router.post('/verify-restore', async (req, res) => {
+  try {
+    const { reference, sessionId, email } = req.body;
+    const cleanRef = (reference || '').trim();
+    const cleanSessionId = (sessionId || '').trim();
+    const cleanEmail = (email || '').trim().toLowerCase();
+
+    if (!cleanRef && !cleanSessionId) {
+      return res.status(400).json({
+        status: false,
+        error: 'A Paystack transaction reference (from your receipt) or session ID is required to restore.'
+      });
+    }
+
+    let customerEmail = cleanEmail;
+    let isPaid = false;
+    let paidAt = null;
+    let nextPaymentDate = null;
+
+    // 1. Try resolving via local sessionStore
+    if (cleanSessionId && isValidSessionId(cleanSessionId)) {
+      const session = sessionStore.get(cleanSessionId);
+      if (session && session.payment_status === 'paid') {
+        isPaid = true;
+        customerEmail = session.customer_email || customerEmail;
+        paidAt = session.paid_at;
+      }
+    }
+
+    if (!isPaid && cleanRef) {
+      const session = sessionStore.getByReference(cleanRef);
+      if (session && session.payment_status === 'paid') {
+        isPaid = true;
+        customerEmail = session.customer_email || customerEmail;
+        paidAt = session.paid_at;
+      }
+    }
+
+    // 2. If not found in local store, verify directly with Paystack API
+    if (!isPaid && cleanRef) {
+      try {
+        const verifyData = await paystackService.verifyTransaction(cleanRef);
+        if (verifyData && verifyData.status === 'success') {
+          // If email was supplied, verify it matches the payer's email on Paystack
+          if (cleanEmail && verifyData.customer?.email && verifyData.customer.email.toLowerCase() !== cleanEmail) {
+            return res.status(403).json({
+              status: false,
+              error: 'Transaction reference does not match the provided email address.'
+            });
+          }
+          isPaid = true;
+          customerEmail = verifyData.customer?.email || customerEmail;
+          paidAt = verifyData.paid_at || new Date().toISOString();
+        }
+      } catch (e) {
+        console.warn('[verify-restore] Paystack verify notice:', e.message);
+      }
+    }
+
+    if (!isPaid) {
+      return res.status(404).json({
+        status: false,
+        error: 'No confirmed payment found for this transaction reference.'
+      });
+    }
+
+    // 3. Compute billing expiration (32 days renewal grace period from last payment)
+    const paidTimestamp = paidAt ? new Date(paidAt).getTime() : Date.now();
+    const defaultExpiresAt = new Date(paidTimestamp + (32 * 24 * 60 * 60 * 1000)).toISOString();
+
+    // Check if active subscription has a more accurate next_payment_date on Paystack
+    if (customerEmail) {
+      try {
+        const subs = await paystackService.getCustomerSubscriptions(customerEmail);
+        const activeSub = subs.find(s => s.status === 'active');
+        if (activeSub && activeSub.next_payment_date) {
+          nextPaymentDate = activeSub.next_payment_date;
+        }
+      } catch (e) {}
+    }
+
+    const expiresAt = nextPaymentDate || defaultExpiresAt;
+    const isExpired = new Date(expiresAt).getTime() < Date.now();
+
+    if (isExpired) {
+      return res.status(400).json({
+        status: false,
+        error: 'This subscription cycle has expired. Please renew your subscription to continue using Pro.'
+      });
+    }
+
+    res.json({
+      status: true,
+      verified: true,
+      customerEmail,
+      paidAt,
+      expiresAt,
+      reference: cleanRef || null
+    });
+  } catch (err) {
+    console.error('[verify-restore] Error:', err);
+    res.status(500).json({ status: false, error: 'Internal server error verifying restore' });
+  }
+});
+
+/**
+ * GET /api/v1/checkout/subscription/validate
+ * Periodic liveness check for active subscriptions
+ */
+router.get('/subscription/validate', async (req, res) => {
+  try {
+    const email = (req.query.email || '').trim().toLowerCase();
+    const reference = (req.query.reference || '').trim();
+
+    if (!email && !reference) {
+      return res.status(400).json({ status: false, error: 'Email or reference is required' });
+    }
+
+    let isValid = false;
+    let nextPaymentDate = null;
+
+    if (email) {
+      const subs = await paystackService.getCustomerSubscriptions(email);
+      const activeSub = subs.find(s => s.status === 'active' || s.status === 'non-renewing');
+      if (activeSub) {
+        isValid = true;
+        nextPaymentDate = activeSub.next_payment_date || null;
+      }
+    }
+
+    if (!isValid && reference) {
+      const session = sessionStore.getByReference(reference);
+      if (session && session.payment_status === 'paid') {
+        const paidTime = new Date(session.paid_at || session.created_at).getTime();
+        // 32 days validity
+        if (Date.now() - paidTime < (32 * 24 * 60 * 60 * 1000)) {
+          isValid = true;
+        }
+      }
+    }
+
+    res.json({
+      status: true,
+      isValid,
+      nextPaymentDate
+    });
+  } catch (err) {
+    console.error('[validateSubscription] Error:', err);
+    res.status(500).json({ status: false, error: 'Error validating subscription' });
+  }
+});
+
 export default router;
