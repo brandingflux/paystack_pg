@@ -1,4 +1,5 @@
 import express from 'express';
+import crypto from 'crypto';
 import { sessionStore } from '../services/sessionStore.js';
 import { fxService, SUPPORTED_CURRENCIES } from '../services/fxService.js';
 import { geoService } from '../services/geoService.js';
@@ -323,7 +324,10 @@ router.post('/sessions/:id/pay', async (req, res) => {
     }
 
     // Generate a fresh unique transaction reference for every payment attempt to avoid duplicate collisions
-    const activeReference = `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
+    const randomSuffix = typeof crypto?.randomBytes === 'function'
+      ? crypto.randomBytes(6).toString('hex')
+      : Math.random().toString(36).substring(2, 12);
+    const activeReference = `ref_${Date.now()}_${randomSuffix}`;
     session.paystack_reference = activeReference;
 
     // Update customer info and active reference

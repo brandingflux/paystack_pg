@@ -8,6 +8,13 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.resolve(__dirname, '../../data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 
+function generateRandomHex(bytes) {
+  if (typeof crypto?.randomBytes === 'function') {
+    return crypto.randomBytes(bytes).toString('hex');
+  }
+  return Math.random().toString(36).substring(2, 2 + bytes * 2);
+}
+
 class SessionStore {
   constructor() {
     this.sessions = new Map();
@@ -57,7 +64,7 @@ class SessionStore {
   create(data) {
     const isTest = !data.isLive;
     const prefix = isTest ? 'cs_test_' : 'cs_live_';
-    const id = `${prefix}${crypto.randomBytes(16).toString('hex')}`;
+    const id = `${prefix}${generateRandomHex(16)}`;
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h expiration
 
@@ -78,8 +85,8 @@ class SessionStore {
       cancel_url: data.cancel_url || null,
       metadata: data.metadata || {},
       subscription_interval: data.subscription_interval || 'monthly', // for mode: 'subscription'
-      paystack_reference: data.paystack_reference || `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`,
-      all_references: [data.paystack_reference || `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`],
+      paystack_reference: data.paystack_reference || `ref_${Date.now()}_${generateRandomHex(6)}`,
+      all_references: [data.paystack_reference || `ref_${Date.now()}_${generateRandomHex(6)}`],
       created_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
       payment_details: null
