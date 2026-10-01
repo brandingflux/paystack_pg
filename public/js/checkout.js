@@ -86,9 +86,23 @@
     // 3. Main Hero Price (100% in user's selected/detected currency, NO Naira)
     heroPrice.textContent = currentPricing.displayFormatted;
     if (isSub) {
-      const interval = sessionData.subscription_interval || 'month';
-      heroInterval.textContent = `/ ${interval}`;
-      itemSubtitle.textContent = `Billed ${interval}ly`;
+      const rawInterval = (sessionData.subscription_interval || 'monthly').toLowerCase();
+      const intervalMap = {
+        hourly: { unit: 'hour', adverb: 'hourly' },
+        daily: { unit: 'day', adverb: 'daily' },
+        weekly: { unit: 'week', adverb: 'weekly' },
+        monthly: { unit: 'month', adverb: 'monthly' },
+        biannually: { unit: '6 months', adverb: 'biannually' },
+        annually: { unit: 'year', adverb: 'annually' }
+      };
+
+      const info = intervalMap[rawInterval] || {
+        unit: rawInterval.replace(/ly$/, ''),
+        adverb: rawInterval.endsWith('ly') ? rawInterval : `${rawInterval}ly`
+      };
+
+      heroInterval.textContent = `/ ${info.unit}`;
+      itemSubtitle.textContent = `Billed ${info.adverb}`;
     } else {
       heroInterval.textContent = '';
       itemSubtitle.textContent = 'One-time payment';
