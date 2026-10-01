@@ -322,10 +322,15 @@ router.post('/sessions/:id/pay', async (req, res) => {
       return res.status(400).json({ status: false, error: 'A valid customer email is required' });
     }
 
-    // Update customer info
+    // Generate a fresh unique transaction reference for every payment attempt to avoid duplicate collisions
+    const activeReference = `ref_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    session.paystack_reference = activeReference;
+
+    // Update customer info and active reference
     sessionStore.update(session.id, {
       customer_email: customerEmail.trim(),
-      customer_name: customerName ? String(customerName).substring(0, 100) : null
+      customer_name: customerName ? String(customerName).substring(0, 100) : null,
+      paystack_reference: activeReference
     });
 
     // Determine settlement amount in merchant currency (NGN)
@@ -370,7 +375,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
       email: customerEmail,
       amountInKobo,
       currency: settlementCurrency,
-      reference: session.paystack_reference,
+      reference: activeReference,
       callbackUrl,
       metadata,
       planCode
@@ -380,7 +385,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
       status: true,
       authorizationUrl: paystackResult.authorizationUrl,
       accessCode: paystackResult.accessCode,
-      reference: session.paystack_reference,
+      reference: activeReference,
       settlementAmount,
       settlementCurrency,
       isMock: paystackService.isMockMode()

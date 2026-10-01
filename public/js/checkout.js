@@ -266,20 +266,13 @@
       }
 
       // Check if Paystack Popup is available and keys are set
-      if (window.PaystackPop && merchantConfig.paystackPublicKey && !merchantConfig.isMockMode) {
+      if (window.PaystackPop && merchantConfig.paystackPublicKey && !merchantConfig.isMockMode && data.accessCode) {
         const handler = window.PaystackPop.setup({
           key: merchantConfig.paystackPublicKey,
-          email: email,
-          amount: Math.round(data.settlementAmount * 100),
-          currency: data.settlementCurrency,
-          ref: data.reference,
-          metadata: {
-            sessionId: sessionId,
-            customerName: name,
-            displayCurrency: currencySelect.value
-          },
+          access_code: data.accessCode,
           callback: function(response) {
-            window.location.href = `/api/v1/checkout/sessions/${sessionId}/verify?reference=${encodeURIComponent(response.reference)}`;
+            const finalRef = response.reference || response.trxref || data.reference;
+            window.location.href = `/api/v1/checkout/sessions/${sessionId}/verify?reference=${encodeURIComponent(finalRef)}`;
           },
           onClose: function() {
             setLoading(false);
@@ -287,7 +280,7 @@
         });
         handler.openIframe();
       } else {
-        // In sandbox/mock mode or direct redirect mode
+        // Fallback to direct authorization URL
         window.location.href = data.authorizationUrl;
       }
     } catch (err) {

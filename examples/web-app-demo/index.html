@@ -213,7 +213,7 @@
           <p>Continuous cloud sync, updates, and priority features.</p>
         </div>
         <div class="plan-cost">
-          <span class="amount" id="subPrice">$9.99</span>
+          <span class="amount" id="subPrice">$0.20</span>
           <span class="cadence">/ month</span>
         </div>
         <ul class="features-list">
@@ -287,8 +287,8 @@
         const geo = await pss.detectUserCurrency();
         const userCurrency = geo.currency || 'USD';
 
-        // Convert $9.99
-        const subRes = await fetch(`/api/v1/currencies/convert?amount=9.99&from=USD&to=${userCurrency}`);
+        // Convert $0.20
+        const subRes = await fetch(`/api/v1/currencies/convert?amount=0.20&from=USD&to=${userCurrency}`);
         const subData = await subRes.json();
         if (subData.formattedConverted) {
           document.getElementById('subPrice').textContent = subData.formattedConverted;
@@ -314,7 +314,7 @@
             {
               name: 'Pro Subscription',
               description: 'Continuous cloud sync & AI features',
-              amount: 9.99,
+              amount: 0.20,
               currency: 'USD',
               quantity: 1
             }

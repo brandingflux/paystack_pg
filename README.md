@@ -449,3 +449,5 @@ paystack_pg/
 ## 📄 License
 Released under the [MIT License](LICENSE).  
 You are free to use, modify, distribute, sublicense, and sell this software in both personal and commercial projects without restriction.
+
+yours M-A-U

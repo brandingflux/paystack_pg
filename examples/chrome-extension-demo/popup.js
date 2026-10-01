@@ -24,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const detectData = await detectRes.json();
     const curr = detectData.currency || 'USD';
 
-    const convRes = await fetch(`${BACKEND_URL}/api/v1/currencies/convert?amount=4.99&from=USD&to=${curr}`);
+    const convRes = await fetch(`${BACKEND_URL}/api/v1/currencies/convert?amount=0.20&from=USD&to=${curr}`);
     const convData = await convRes.json();
     if (convData.formattedConverted) {
       extPriceDisplay.textContent = convData.formattedConverted;
     }
   } catch (e) {
-    // Keep default $4.99
+    // Keep default $0.20
   }
 
   // Upgrade button
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             {
               name: 'QuickExtension Pro',
               description: 'Unlimited access for Chrome Extension',
-              amount: 4.99,
+              amount: 0.20,
               currency: 'USD',
               quantity: 1
             }
