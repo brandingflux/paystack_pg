@@ -144,9 +144,9 @@
     if (submitPayBtn.disabled) return;
     const isSub = sessionData?.mode === 'subscription';
     if (isSub) {
-      btnLabel.textContent = `Subscribe`;
+      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''} with Card`;
     } else {
-      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''}`;
+      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''} with Card`;
     }
   }
 
@@ -155,77 +155,67 @@
     loadSession(e.target.value);
   });
 
-  // Card formatting and Brand Detection
-  cardNumber.addEventListener('input', (e) => {
-    let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-    // Format in blocks of 4
-    let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
-    e.target.value = formatted;
+  // Card formatting and Brand Detection (safe guards if present)
+  if (cardNumber) {
+    cardNumber.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+      e.target.value = formatted;
+      detectCardBrand(val);
+    });
+  }
 
-    // Detect brand
-    detectCardBrand(val);
-  });
-
-  // Expiry formatting MM / YY with seamless backspacing
-  cardExpiry.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace') {
-      const val = cardExpiry.value;
-      // If cursor is at the separator (e.g. "MM / "), cleanly delete into the month
-      if (val.length === 5 && val.endsWith(' / ')) {
-        e.preventDefault();
-        cardExpiry.value = val.substring(0, 1);
+  if (cardExpiry) {
+    cardExpiry.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        const val = cardExpiry.value;
+        if (val.length === 5 && val.endsWith(' / ')) {
+          e.preventDefault();
+          cardExpiry.value = val.substring(0, 1);
+        }
       }
-    }
-  });
+    });
 
-  cardExpiry.addEventListener('input', (e) => {
-    let inputVal = e.target.value;
-    
-    // When deleting backward, let user backspace cleanly past separator
-    if (e.inputType === 'deleteContentBackward') {
-      if (inputVal.endsWith(' /') || inputVal.endsWith(' ')) {
-        e.target.value = inputVal.replace(/\D+$/, '');
-        return;
+    cardExpiry.addEventListener('input', (e) => {
+      let inputVal = e.target.value;
+      if (e.inputType === 'deleteContentBackward') {
+        if (inputVal.endsWith(' /') || inputVal.endsWith(' ')) {
+          e.target.value = inputVal.replace(/\D+$/, '');
+          return;
+        }
       }
-    }
+      let digits = inputVal.replace(/\D/g, '').substring(0, 4);
+      if (digits.length === 1 && parseInt(digits, 10) > 1 && e.inputType !== 'deleteContentBackward') {
+        digits = '0' + digits;
+      }
+      if (digits.length >= 2) {
+        let month = parseInt(digits.substring(0, 2), 10);
+        if (month > 12) month = 12;
+        if (month === 0) month = 1;
+        const monthStr = String(month).padStart(2, '0');
+        const yearStr = digits.substring(2);
+        e.target.value = monthStr + ' / ' + yearStr;
+      } else {
+        e.target.value = digits;
+      }
+    });
+  }
 
-    let digits = inputVal.replace(/\D/g, '').substring(0, 4);
-
-    // Auto-prefix months 2-9 with 0 (e.g. typing 4 -> 04 / )
-    if (digits.length === 1 && parseInt(digits, 10) > 1 && e.inputType !== 'deleteContentBackward') {
-      digits = '0' + digits;
-    }
-
-    if (digits.length >= 2) {
-      let month = parseInt(digits.substring(0, 2), 10);
-      if (month > 12) month = 12;
-      if (month === 0) month = 1;
-      const monthStr = String(month).padStart(2, '0');
-      const yearStr = digits.substring(2);
-
-      e.target.value = monthStr + ' / ' + yearStr;
-    } else {
-      e.target.value = digits;
-    }
-  });
-
-  // CVC formatting
-  cardCvc.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-  });
+  if (cardCvc) {
+    cardCvc.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+    });
+  }
 
   function detectCardBrand(digits) {
+    if (!cardBrandIconSlot) return;
     if (digits.startsWith('4')) {
-      // Visa
       cardBrandIconSlot.innerHTML = `<svg class="brand-icon-svg" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#1A1F71"/><text x="18" y="16" fill="white" font-size="11" font-weight="900" text-anchor="middle" font-style="italic">VISA</text></svg>`;
     } else if (/^(5[1-5]|2[2-7])/.test(digits)) {
-      // Mastercard
       cardBrandIconSlot.innerHTML = `<svg class="brand-icon-svg" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#0A2540"/><circle cx="14" cy="12" r="7" fill="#EB001B"/><circle cx="22" cy="12" r="7" fill="#F79E1B" fill-opacity="0.8"/></svg>`;
     } else if (/^3[47]/.test(digits)) {
-      // Amex
       cardBrandIconSlot.innerHTML = `<svg class="brand-icon-svg" viewBox="0 0 36 24"><rect width="36" height="24" rx="3" fill="#0077A6"/><text x="18" y="16" fill="white" font-size="9" font-weight="900" text-anchor="middle">AMEX</text></svg>`;
     } else {
-      // Default
       cardBrandIconSlot.innerHTML = `<svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="3" fill="#0A2540"/><circle cx="13" cy="12" r="6" fill="#8898AA" fill-opacity="0.6"/><circle cx="23" cy="12" r="6" fill="#8898AA" fill-opacity="0.4"/></svg>`;
     }
   }

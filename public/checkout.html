@@ -104,66 +104,23 @@
             >
           </div>
 
-          <!-- Unified Card Element -->
+          <!-- Payment Method -->
           <div class="field-group">
-            <label class="field-label">Card information</label>
-            <div class="stripe-card-group">
-              <!-- Card Number -->
-              <div class="card-number-row">
-                <input 
-                  type="text" 
-                  id="cardNumber" 
-                  class="card-number-input" 
-                  placeholder="1234 1234 1234 1234" 
-                  inputmode="numeric"
-                  maxlength="19"
-                  autocomplete="cc-number"
-                  required
-                >
-                <div class="card-icons-slot" id="cardBrandIconSlot">
-                  <!-- Default card brand logos -->
-                  <svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none">
-                    <rect width="36" height="24" rx="3" fill="#0A2540"/>
-                    <path d="M14.5 16.5L16.8 7.5H19.2L16.9 16.5H14.5ZM12.7 7.5L10.4 13.8L10.1 12.3C9.6 10.6 8.1 8.8 6.5 7.9L8.6 16.5H11.1L15.1 7.5H12.7ZM25.2 16.5H27.5L25.6 7.5H23.5C23.0 7.5 22.6 7.8 22.4 8.2L19.2 16.5H21.7L22.2 15.1H25.0L25.2 16.5ZM22.8 13.2L24.0 9.8L24.7 13.2H22.8ZM33.2 7.5H30.8C30.4 7.5 30.1 7.7 29.9 8.1L26.3 16.5H28.8L29.3 15.1H32.2L32.5 16.5H35.0L33.2 7.5ZM5.4 7.5H0.8L0.7 7.9C3.8 8.7 6.4 10.6 7.3 12.8L6.4 8.5C6.2 7.8 5.8 7.5 5.4 7.5Z" fill="white"/>
-                  </svg>
-                </div>
+            <label class="field-label">Payment Method</label>
+            <div class="stripe-card-group" style="padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; background: #fafbfc; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">💳</span>
+                <span style="font-weight: 600; font-size: 14px; color: #0a2540;">Debit or Credit Card</span>
               </div>
-
-              <!-- Expiry & CVC Row -->
-              <div class="card-details-row">
-                <div class="card-expiry-half">
-                  <input 
-                    type="text" 
-                    id="cardExpiry" 
-                    class="card-sub-input" 
-                    placeholder="MM / YY" 
-                    inputmode="numeric" 
-                    maxlength="7"
-                    autocomplete="cc-exp"
-                    required
-                  >
-                </div>
-                <div class="card-cvc-half">
-                  <input 
-                    type="text" 
-                    id="cardCvc" 
-                    class="card-sub-input" 
-                    placeholder="CVC" 
-                    inputmode="numeric" 
-                    maxlength="4"
-                    autocomplete="cc-csc"
-                    required
-                  >
-                  <div class="cvc-icon-slot">
-                    <svg width="18" height="14" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <rect x="1" y="1" width="22" height="16" rx="2"></rect>
-                      <line x1="1" y1="6" x2="23" y2="6"></line>
-                      <circle cx="18" cy="12" r="1.5"></circle>
-                    </svg>
-                  </div>
-                </div>
+              <div class="card-icons-slot" style="display: flex; gap: 6px; align-items: center;">
+                <svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="3" fill="#1A1F71"/><text x="18" y="16" fill="white" font-size="11" font-weight="900" text-anchor="middle" font-style="italic">VISA</text></svg>
+                <svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="3" fill="#0A2540"/><circle cx="14" cy="12" r="7" fill="#EB001B"/><circle cx="22" cy="12" r="7" fill="#F79E1B" fill-opacity="0.8"/></svg>
+                <svg class="brand-icon-svg" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="3" fill="#0077A6"/><text x="18" y="16" fill="white" font-size="9" font-weight="900" text-anchor="middle">AMEX</text></svg>
               </div>
             </div>
+            <p style="font-size: 12px; color: #697386; margin-top: 6px; line-height: 1.4;">
+              Card details are entered securely in the official Paystack popup with 256-bit SSL encryption.
+            </p>
           </div>
 
           <!-- Cardholder Name -->

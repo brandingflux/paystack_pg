@@ -33,7 +33,7 @@ class PaystackService {
    * @param {string} [params.planCode] - Paystack Plan code for recurring subscriptions
    * @returns {Promise<{ authorizationUrl: string, accessCode: string, reference: string }>}
    */
-  async initializeTransaction({ email, amountInKobo, currency = 'NGN', reference, callbackUrl, metadata = {}, planCode }) {
+  async initializeTransaction({ email, amountInKobo, currency = 'NGN', reference, callbackUrl, metadata = {}, planCode, channels }) {
     if (this.isMockMode()) {
       console.log(`[Paystack Mock] Initializing transaction ref=${reference} amount=${amountInKobo} ${currency} for ${email}`);
       const mockAccessCode = `mock_acc_${Date.now()}`;
@@ -56,6 +56,13 @@ class PaystackService {
 
       if (planCode) {
         payload.plan = planCode;
+        // Subscriptions strictly require a saved card for recurring automated billing
+        payload.channels = ['card'];
+      } else if (channels && Array.isArray(channels) && channels.length > 0) {
+        payload.channels = channels;
+      } else {
+        // Default to Card first
+        payload.channels = ['card', 'apple_pay'];
       }
 
       const res = await this.api.post('/transaction/initialize', payload, {
