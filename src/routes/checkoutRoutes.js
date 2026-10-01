@@ -150,10 +150,10 @@ router.post('/sessions', async (req, res) => {
 
     // App-specific security enforcement for Focus825 Chrome Extension
     if (metadata && metadata.app_id === 'focus825_chrome_ext') {
-      if (total < 2.99 || mode !== 'subscription' || subscription_interval !== 'monthly') {
+      if (total < 0.20 || mode !== 'subscription' || subscription_interval !== 'monthly') {
         return res.status(400).json({
           status: false,
-          error: 'Focus825 Pro requires a monthly recurring subscription of at least $2.99 USD'
+          error: 'Focus825 Pro requires a monthly recurring subscription of at least $0.20 USD'
         });
       }
     }
