@@ -144,9 +144,9 @@
     if (submitPayBtn.disabled) return;
     const isSub = sessionData?.mode === 'subscription';
     if (isSub) {
-      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''} with Card`;
+      btnLabel.textContent = `Subscribe • ${currentPricing?.displayFormatted || ''}`;
     } else {
-      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''} with Card`;
+      btnLabel.textContent = `Pay ${currentPricing?.displayFormatted || ''}`;
     }
   }
 

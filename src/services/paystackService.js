@@ -56,13 +56,10 @@ class PaystackService {
 
       if (planCode) {
         payload.plan = planCode;
-        // Subscriptions strictly require a saved card for recurring automated billing
-        payload.channels = ['card'];
-      } else if (channels && Array.isArray(channels) && channels.length > 0) {
+      }
+
+      if (channels && Array.isArray(channels) && channels.length > 0) {
         payload.channels = channels;
-      } else {
-        // Default to Card first
-        payload.channels = ['card', 'apple_pay'];
       }
 
       const res = await this.api.post('/transaction/initialize', payload, {

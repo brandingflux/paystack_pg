@@ -374,7 +374,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
       metadata.planCode = planCode;
     }
 
-    // Initialize with Paystack (strictly card channel for recurring subscriptions)
+    // Initialize with Paystack using merchant's configured active channels
     const paystackResult = await paystackService.initializeTransaction({
       email: customerEmail,
       amountInKobo,
@@ -382,8 +382,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
       reference: activeReference,
       callbackUrl,
       metadata,
-      planCode,
-      channels: ['card']
+      planCode
     });
 
     res.json({
