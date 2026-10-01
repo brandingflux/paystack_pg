@@ -265,23 +265,52 @@
         throw new Error(data.error || 'Failed to initialize payment');
       }
 
-      // Check if Paystack Popup is available and keys are set
-      if (window.PaystackPop && merchantConfig.paystackPublicKey && !merchantConfig.isMockMode && data.accessCode) {
-        const handler = window.PaystackPop.setup({
-          key: merchantConfig.paystackPublicKey,
-          access_code: data.accessCode,
-          callback: function(response) {
-            const finalRef = response.reference || response.trxref || data.reference;
-            window.location.href = `/api/v1/checkout/sessions/${sessionId}/verify?reference=${encodeURIComponent(finalRef)}`;
-          },
-          onClose: function() {
-            setLoading(false);
+      // Open Paystack Popup or fallback to direct authorization URL
+      if (window.PaystackPop && data.accessCode && !merchantConfig?.isMockMode) {
+        try {
+          // Check for Paystack Inline v2
+          if (typeof PaystackPop === 'function') {
+            const popup = new PaystackPop();
+            if (typeof popup.checkout === 'function') {
+              popup.checkout({
+                accessCode: data.accessCode,
+                onSuccess: function(transaction) {
+                  const finalRef = transaction?.reference || transaction?.trxref || data.reference;
+                  window.location.href = `/api/v1/checkout/sessions/${sessionId}/verify?reference=${encodeURIComponent(finalRef)}`;
+                },
+                onCancel: function() {
+                  setLoading(false);
+                }
+              });
+              return;
+            }
           }
-        });
-        handler.openIframe();
-      } else {
-        // Fallback to direct authorization URL
+          // Legacy v1 setup fallback
+          if (window.PaystackPop.setup) {
+            const handler = window.PaystackPop.setup({
+              key: merchantConfig.paystackPublicKey,
+              access_code: data.accessCode,
+              callback: function(response) {
+                const finalRef = response?.reference || response?.trxref || data.reference;
+                window.location.href = `/api/v1/checkout/sessions/${sessionId}/verify?reference=${encodeURIComponent(finalRef)}`;
+              },
+              onClose: function() {
+                setLoading(false);
+              }
+            });
+            handler.openIframe();
+            return;
+          }
+        } catch (popErr) {
+          console.warn('[Checkout] Inline popup failed, falling back to authorizationUrl:', popErr);
+        }
+      }
+
+      // Direct authorization URL redirect fallback (hosted Paystack page)
+      if (data.authorizationUrl) {
         window.location.href = data.authorizationUrl;
+      } else {
+        throw new Error('Unable to start payment gateway session');
       }
     } catch (err) {
       alert('Checkout error: ' + err.message);

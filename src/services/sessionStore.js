@@ -78,7 +78,8 @@ class SessionStore {
       cancel_url: data.cancel_url || null,
       metadata: data.metadata || {},
       subscription_interval: data.subscription_interval || 'monthly', // for mode: 'subscription'
-      paystack_reference: data.paystack_reference || `ref_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      paystack_reference: data.paystack_reference || `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`,
+      all_references: [data.paystack_reference || `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`],
       created_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
       payment_details: null
@@ -94,8 +95,13 @@ class SessionStore {
   }
 
   getByReference(ref) {
+    if (!ref) return null;
+    const cleanRef = String(ref).trim();
     for (const session of this.sessions.values()) {
-      if (session.paystack_reference === ref) {
+      if (session.paystack_reference === cleanRef) {
+        return session;
+      }
+      if (Array.isArray(session.all_references) && session.all_references.includes(cleanRef)) {
         return session;
       }
     }
@@ -118,7 +124,15 @@ class SessionStore {
     const session = this.sessions.get(id);
     if (!session) return null;
 
-    const updated = { ...session, ...partial };
+    const allRefs = new Set(session.all_references || []);
+    if (session.paystack_reference) allRefs.add(session.paystack_reference);
+    if (partial.paystack_reference) allRefs.add(partial.paystack_reference);
+
+    const updated = { 
+      ...session, 
+      ...partial,
+      all_references: Array.from(allRefs)
+    };
     this.sessions.set(id, updated);
     this.persistSessions();
     return updated;

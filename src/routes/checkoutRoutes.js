@@ -323,7 +323,7 @@ router.post('/sessions/:id/pay', async (req, res) => {
     }
 
     // Generate a fresh unique transaction reference for every payment attempt to avoid duplicate collisions
-    const activeReference = `ref_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const activeReference = `ref_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
     session.paystack_reference = activeReference;
 
     // Update customer info and active reference
